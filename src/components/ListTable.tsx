@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { Divider, Radio, Table } from 'antd';
-import type { TableColumnsType } from 'antd';
+import { Table, TableColumnsType, MenuProps, Dropdown, Space } from 'antd';
+import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+
 import { statusFormatter } from '@utils/functions';
-import { tmpData } from '@utils/functions';
-import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
-import type { MenuProps } from 'antd';
-import { Dropdown, Space } from 'antd';
+import CustomDropdown from './CustomDropdown';
 
 interface ListTableProps {
   onClick: () => void;
@@ -85,46 +83,8 @@ const columns: TableColumnsType<DataType> = [
     align: 'center',
     fixed: 'right',
     width: 52,
-    render: () => (
-      // <a>
-      //   <MoreOutlined />
-      // </a>
-      <Dropdown menu={{ items }}>
-        <a onClick={(e) => e.preventDefault()}>
-          <Space>
-            <MoreOutlined />
-          </Space>
-        </a>
-      </Dropdown>
-    ),
+    render: () => <CustomDropdown />,
   },
-];
-
-const items: MenuProps['items'] = [
-  {
-    key: '1',
-    icon: <EditOutlined />,
-    label: (
-      <a target="_blank" rel="noopener noreferrer" href="https://www.antgroup.com">
-        수정
-      </a>
-    ),
-  },
-  {
-    key: '2',
-    danger: true,
-    icon: <DeleteOutlined />,
-    label: '삭제',
-  },
-  // {
-  //   key: '3',
-  //   label: (
-  //     <a target="_blank" rel="noopener noreferrer" href="https://www.luohanacademy.com">
-  //       3rd menu item (disabled)
-  //     </a>
-  //   ),
-  //   disabled: true,
-  // },
 ];
 
 const data: DataType[] = [
@@ -164,7 +124,7 @@ const data: DataType[] = [
 
 const rowSelection = {
   onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-    console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
   },
   getCheckboxProps: (record: DataType) => ({
     disabled: record.title === 'Disabled User', // Column configuration not to be checked

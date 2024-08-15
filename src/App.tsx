@@ -1,59 +1,57 @@
 import { TabsProps } from 'antd';
 import TabMenu from '@components/TabMenu';
 import CustomCalendar from '@components/CustomCalendar';
-import BoardViewSection from '@pages/BoardViewSection';
+import BoardViewSection from '@components/layout/BoardViewSection';
 import WriteModal from '@components/WriteModal';
 import FloatInfoBtn from '@components/FloatInfoBtn';
 import { Button, Modal, Space } from 'antd';
-import AllViewSection from '@pages/AllViewSection';
-import ListViewSection from '@pages/ListViewSection';
+import AllViewSection from '@components/layout/AllViewSection';
+import ListViewSection from '@components/layout/ListViewSection';
+import { Router } from './Router';
+import { useStore } from 'zustand';
+import { userInfoStore } from '@store/store';
+import { supabase } from '@api/supabaseClient';
+import { useEffect, useState } from 'react';
+import Header from '@components/layout/Header';
 
 function App() {
-  const onChange = (key: string) => {
-    console.log(key);
-  };
+  const { userInfo, setUserInfo } = userInfoStore();
 
-  const tabContents: TabsProps['items'] = [
-    {
-      key: '1',
-      label: 'All',
-      children: <AllViewSection />,
-    },
-    {
-      key: '2',
-      label: 'Calendar',
-      children: <CustomCalendar />,
-    },
-    {
-      key: '3',
-      label: 'List',
-      children: <ListViewSection />,
-    },
-    {
-      key: '4',
-      label: 'Board',
-      children: <BoardViewSection />,
-    },
-  ];
+  async function getUserInfo() {
+    // Get the user session and user details
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
-  const info = () => {
-    Modal.info({
-      title: 'About',
-      content: (
-        <div>
-          <p>To do all은 직장인의 스케줄 관리에 적합한 1달 단위 스케줄러입니다.</p>
-          <p>투두 리스트 + 캘린더 + 보드 형식으로 사용할 수 있습니다.</p>
-        </div>
-      ),
-      onOk() {},
-    });
-  };
+    if (error) {
+      console.error('Error fetching user:', error.message);
+      return null;
+    }
+
+    // If user exists, log their information
+    if (user) {
+      setUserInfo(user);
+      return user;
+    }
+
+    return null;
+  }
+
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
   return (
-    <div className="App">
-      <TabMenu tabContents={tabContents} onChange={onChange} />
-      {/* <WriteModal /> */}
-      <FloatInfoBtn onClick={info} />
-    </div>
+    <>
+      <Header isLoggedIn={userInfo} />
+      <Router isLoggedIn={userInfo} />
+    </>
+    // <div className="App">
+    //   <TabMenu tabContents={tabContents} onChange={onChange} />
+    //   {/* <WriteModal /> */}
+    //   <FloatInfoBtn onClick={info} />
+    // </div>
   );
 }
 

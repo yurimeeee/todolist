@@ -18,3 +18,18 @@ export interface ToDoItem {
 // complete : 완료
 // stop : 일시정지
 // cancel : 보류
+
+
+export interface Todo {
+  uid: string; // UUID
+  title: string;
+  content: string;
+  period: [string | null, string | null]; // ISO 8601 date strings or null
+  time: [string | null, string | null]; // ISO 8601 date strings or null
+  compDate: string | null; // ISO 8601 date string or null
+  priority: 'H' | 'M' | 'L'; // Priority levels (High, Medium, Low)
+  status: 'before' | 'progress' | 'complete' | 'cancel'; // Status values
+  toDoType: string; // Color in hex format
+  createdAt: string; // ISO 8601 date string
+  id: string; // UUID
+}

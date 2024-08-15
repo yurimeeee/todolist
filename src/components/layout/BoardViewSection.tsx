@@ -1,12 +1,16 @@
 import styled from 'styled-components';
-import { Card } from 'antd';
 import { DndContext } from '@dnd-kit/core';
+
 import { tmpData } from '@utils/functions';
+import CustomCard from '@components/CustomCard';
+import { supabase } from '@api/supabaseClient';
+import { useEffect } from 'react';
+import { Todo } from 'src/types/type';
 
-// import { Draggable } from './Draggable';
-// import { Droppable } from './Droppable';
-
-const BoardViewSection = () => {
+interface BoardViewSectionProps {
+  data: Todo[];
+}
+const BoardViewSection = ({ data }: BoardViewSectionProps) => {
   return (
     <Wrap>
       <CardContainer>
@@ -16,42 +20,34 @@ const BoardViewSection = () => {
           </Droppable> */}
         </DndContext>
         <Header>진행예정</Header>
-        {tmpData
+        {data
           ?.filter((item) => item.status === 'before')
-          .map((item) => (
-            <Card key={item.key} size="small" title={item.title} extra={<a href="#">More</a>} style={{ width: 300 }}>
-              <p>{item.content}</p>
-            </Card>
+          .map((item, idx) => (
+            <CustomCard data={item} key={idx} />
           ))}
       </CardContainer>
       <CardContainer>
         <Header>진행중</Header>
-        {tmpData
+        {data
           ?.filter((item) => item.status === 'progress')
-          .map((item) => (
-            <Card key={item.key} size="small" title={item.title} extra={<a href="#">More</a>} style={{ width: 300 }}>
-              <p>{item.content}</p>
-            </Card>
+          .map((item, idx) => (
+            <CustomCard data={item} key={idx} />
           ))}
       </CardContainer>
       <CardContainer>
         <Header>완료</Header>
-        {tmpData
+        {data
           ?.filter((item) => item.status === 'complete')
-          .map((item) => (
-            <Card key={item.key} size="small" title={item.title} extra={<a href="#">More</a>} style={{ width: 300 }}>
-              <p>{item.content}</p>
-            </Card>
+          .map((item, idx) => (
+            <CustomCard data={item} key={idx} />
           ))}
       </CardContainer>
       <CardContainer>
         <Header>보류</Header>
-        {tmpData
+        {data
           ?.filter((item) => item.status === 'cancel')
-          .map((item) => (
-            <Card key={item.key} size="small" title={item.title} extra={<a href="#">More</a>} style={{ width: 300 }}>
-              <p>{item.content}</p>
-            </Card>
+          .map((item, idx) => (
+            <CustomCard data={item} key={idx} />
           ))}
       </CardContainer>
     </Wrap>
@@ -68,11 +64,12 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
 `;
 const Header = styled.div`
-  height: 40px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #ebebeb;
+  height: 40px;
+  background: #ebf6ff;
 `;

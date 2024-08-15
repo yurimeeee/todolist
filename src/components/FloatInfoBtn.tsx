@@ -1,5 +1,5 @@
-import { QuestionCircleOutlined } from '@ant-design/icons';
 import { FloatButton } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
 
 interface FloatInfoBtnProps {
   onClick: () => void;

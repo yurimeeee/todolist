@@ -1,6 +1,6 @@
 import styled from 'styled-components';
-import { BadgeProps, CalendarProps } from 'antd';
 import { Badge, Calendar, ConfigProvider } from 'antd';
+import { BadgeProps, CalendarProps } from 'antd';
 import { Dayjs } from 'dayjs';
 import koKR from 'antd/es/locale/ko_KR';
 
