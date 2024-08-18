@@ -55,7 +55,7 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
             {data.title}
           </TitleBox>
         }
-        extra={<CustomDropdown />}
+        extra={<CustomDropdown todoId={data.id} />}
       >
         <Contents>
           <p>{data.content}</p>

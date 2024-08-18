@@ -6,9 +6,11 @@ import dayjs from 'dayjs';
 
 import { statusFormatter } from '@utils/functions';
 import CustomDropdown from './CustomDropdown';
+import { Todo } from 'src/types/type';
 
 interface ListTableProps {
-  onClick: () => void;
+  data?: Todo[];
+  // onClick: () => void;
 }
 
 interface DataType {
@@ -21,6 +23,7 @@ interface DataType {
   status: 'before' | 'progress' | 'complete' | 'stop' | 'cancel';
 }
 
+// const columns: TableColumnsType<DataType> = [
 const columns: TableColumnsType<DataType> = [
   {
     title: '할일',
@@ -31,21 +34,21 @@ const columns: TableColumnsType<DataType> = [
     title: '시작일',
     dataIndex: 'startDate',
     align: 'center',
-    render: (date: Dayjs) => date.format('YYYY-MM-DD'),
+    render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
     sorter: (a, b) => a.startDate.unix() - b.startDate.unix(),
   },
   {
     title: '목표일',
     dataIndex: 'endDate',
     align: 'center',
-    render: (date: Dayjs) => date.format('YYYY-MM-DD'),
+    render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
     sorter: (a, b) => a.endDate.unix() - b.endDate.unix(),
   },
   {
     title: '완료일',
     dataIndex: 'compDate',
     align: 'center',
-    render: (date: Dayjs) => date.format('YYYY-MM-DD'),
+    render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
     sorter: (a, b) => a.compDate.unix() - b.compDate.unix(),
   },
   {
@@ -83,42 +86,7 @@ const columns: TableColumnsType<DataType> = [
     align: 'center',
     fixed: 'right',
     width: 52,
-    render: () => <CustomDropdown />,
-  },
-];
-
-const data: DataType[] = [
-  {
-    key: '1',
-    title: '플러터 공부',
-    startDate: dayjs('2024-08-20'),
-    endDate: dayjs('2024-08-24'),
-    compDate: dayjs(),
-    status: 'before',
-  },
-  {
-    key: '2',
-    title: '책 읽기',
-    startDate: dayjs('2024-08-18'),
-    endDate: dayjs('2024-08-19'),
-    compDate: dayjs(),
-    status: 'before',
-  },
-  {
-    key: '3',
-    title: 'todolist 만들기',
-    startDate: dayjs('2024-08-11'),
-    endDate: dayjs('2024-08-30'),
-    compDate: dayjs(),
-    status: 'progress',
-  },
-  {
-    key: '4',
-    title: '요리하기',
-    startDate: dayjs('2024-08-01'),
-    endDate: dayjs('2024-08-13'),
-    compDate: dayjs(),
-    status: 'progress',
+    render: () => <CustomDropdown todoId="dfdsfd" />,
   },
 ];
 
@@ -131,30 +99,27 @@ const rowSelection = {
     title: record.title,
   }),
 };
-const ListTable = () => {
-  const [selectionType, setSelectionType] = useState<'checkbox' | 'radio'>('checkbox');
+const ListTable = ({ data }: ListTableProps) => {
+  // Todo 타입을 DataType으로 변환하는 함수
+  const convertTodosToDataType = (todos: Todo[]): DataType[] => {
+    return todos.map((todo) => ({
+      key: todo.id,
+      title: todo.title,
+      startDate: dayjs(todo.period[0]),
+      endDate: dayjs(todo.period[1]),
+      compDate: dayjs(todo.compDate),
+      status: todo.status,
+    }));
+  };
 
   return (
     <div>
-      {/* <Radio.Group
-        onChange={({ target: { value } }) => {
-          setSelectionType(value);
-        }}
-        value={selectionType}
-      >
-        <Radio value="checkbox">Checkbox</Radio>
-        <Radio value="radio">radio</Radio>
-      </Radio.Group>
-
-      <Divider /> */}
-
       <Table
         rowSelection={{
-          // type: selectionType,
           ...rowSelection,
         }}
         columns={columns}
-        dataSource={data}
+        dataSource={data ? convertTodosToDataType(data) : undefined}
         size="middle"
       />
     </div>

@@ -10,29 +10,83 @@ function Signup() {
   const [userId, setUserId] = useState('');
   const [userName, setUserName] = useState('');
 
+  // const onFinish = async (values: any) => {
+  //   const { data, error } = await supabase.auth.signUp({
+  //     email: values.email,
+  //     password: values.password,
+  //   });
+
+  //   if (error) {
+  //     throw error;
+  //   }
+
+  //   const userData = await supabase.from('userInfo').insert({
+  //     id: data.user?.id,
+  //     email: values.email,
+  //     // user_id: values.user_id,
+  //     // user_pw: values.password,
+  //     user_name: values.user_name,
+  //     avatar_url: '',
+  //   });
+
+  //   console.log(userData);
+  //   alert('회원가입');
+  // };
+
   const onFinish = async (values: any) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
+      // 회원가입 (이메일, 비밀번호만 사용)
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
-        options: {
-          data: {
-            user_id: values.user_id,
-            user_name: values.user_name,
-            image_url: '',
-          },
-        },
       });
 
-      if (error) {
-        throw error;
-      }
+      // if (signUpError) throw signUpError;
 
-      console.log('가입 완료 data', data);
+      // // 추가 정보 userInfo 테이블에 삽입
+      const { data: insertData, error: insertError } = await supabase.from('userInfo').insert([
+        {
+          id: signUpData.user?.id,
+          email: values.email,
+          // user_id: values.user_id,
+          // user_pw: values.password,
+          user_name: values.user_name,
+          avatar_url: '',
+        },
+      ]);
+
+      // if (insertError) throw insertError;
+
+      console.log('가입 완료:', signUpData);
     } catch (error) {
       console.log('Sign-up failed: ' + (error as Error).message);
     }
   };
+
+  // const onFinish = async (values: any) => {
+  //   try {
+  //     const { data, error } = await supabase.auth.signUp({
+  //       email: values.email,
+  //       password: values.password,
+  //       options: {
+  //         data: {
+  //           user_email: values.email,
+  //           user_id: values.user_id,
+  //           user_pw: values.password,
+  //           user_name: values.user_name,
+  //           avatar_url: '',
+  //         },
+  //       },
+  //     });
+  //     if (error) {
+  //       throw error;
+  //     }
+
+  //     console.log('가입 완료 data', data);
+  //   } catch (error) {
+  //     console.log('Sign-up failed: ' + (error as Error).message);
+  //   }
+  // };
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
     console.log('Failed:', errorInfo);
@@ -46,7 +100,7 @@ function Signup() {
   //       data: {
   //         user_id: userId,
   //         user_name: userName,
-  //         image_url: '',
+  //         avatar_url: '',
   //       },
   //     },
   //   });
@@ -66,13 +120,13 @@ function Signup() {
         onFinishFailed={onFinishFailed}
         autoComplete="off"
       >
-        <Form.Item name="user_id" label="ID" rules={[{ required: true, message: 'Please input your ID!' }]}>
+        {/* <Form.Item name="user_id" label="ID" rules={[{ required: true, message: 'Please input your ID!' }]}>
           <Input
             onChange={(e) => {
               setUserId(e.target.value);
             }}
           />
-        </Form.Item>
+        </Form.Item> */}
         <Form.Item name="email" label="EMAIL" rules={[{ required: true, message: 'Please input your Email!' }]}>
           <Input
             onChange={(e) => {

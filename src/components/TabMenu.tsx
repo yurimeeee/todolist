@@ -8,12 +8,17 @@ interface TabMenuProps {
   tabContents: TabsProps['items'];
   onChange: (key: string) => void;
 }
-const operations = <WriteModal />;
+// const operations = <WriteModal />;
 
 const TabMenu = ({ tabContents, onChange }: TabMenuProps) => {
   return (
     <Wrap>
-      <Tabs defaultActiveKey="1" items={tabContents} onChange={onChange} tabBarExtraContent={operations} />
+      <Tabs
+        defaultActiveKey="1"
+        items={tabContents}
+        onChange={onChange}
+        // tabBarExtraContent={operations}
+      />
     </Wrap>
   );
 };

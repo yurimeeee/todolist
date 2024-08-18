@@ -1,15 +1,15 @@
-import { TabsProps } from 'antd';
+import { useEffect } from 'react';
+import { Modal, TabsProps } from 'antd';
+
 import TabMenu from '@components/TabMenu';
 import CustomCalendar from '@components/CustomCalendar';
 import BoardViewSection from '@components/layout/BoardViewSection';
-import WriteModal from '@components/WriteModal';
 import FloatInfoBtn from '@components/FloatInfoBtn';
-import { Button, Modal, Space } from 'antd';
 import AllViewSection from '@components/layout/AllViewSection';
 import ListViewSection from '@components/layout/ListViewSection';
+
 import { toDoListStore } from '@store/store';
 import { supabase } from '@api/supabaseClient';
-import { useEffect } from 'react';
 
 function Home() {
   const { toDoList, setToDoList } = toDoListStore();
@@ -20,6 +20,7 @@ function Home() {
 
   useEffect(() => {
     getData();
+    console.log(toDoList);
   }, []);
 
   const onChange = (key: string) => {
@@ -65,7 +66,6 @@ function Home() {
   return (
     <div className="App">
       <TabMenu tabContents={tabContents} onChange={onChange} />
-      {/* <WriteModal /> */}
       <FloatInfoBtn onClick={info} />
     </div>
   );

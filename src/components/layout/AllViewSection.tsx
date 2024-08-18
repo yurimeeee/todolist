@@ -125,7 +125,7 @@ const AllViewSection = ({ data }: AllViewSectionProps) => {
       </CardSection>
       <FlexBox>
         <CustomCalendar />
-        <ListTable />
+        <ListTable data={data} />
       </FlexBox>
     </Wrap>
   );
@@ -153,12 +153,9 @@ const Header = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #ebebeb;
+  background: #ebf6ff;
 `;
 const FlexBox = styled.div`
   display: flex;
   gap: 16px;
-  /* justify-content: center;
-  align-items: center;
-  background: #ebebeb; */
 `;
