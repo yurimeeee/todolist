@@ -59,9 +59,7 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
       >
         <Contents>
           <p>{data.content}</p>
-          <BadgeBox>
-            <Badge count={renderDday()} showZero color="#a7c3eb" />
-          </BadgeBox>
+          <BadgeBox>{/* <Badge count={renderDday()} showZero color="#a7c3eb" /> */}</BadgeBox>
         </Contents>
       </Card>
     </Wrapper>

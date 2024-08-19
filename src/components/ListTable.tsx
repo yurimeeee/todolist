@@ -101,13 +101,16 @@ const rowSelection = {
 };
 const ListTable = ({ data }: ListTableProps) => {
   // Todo 타입을 DataType으로 변환하는 함수
-  const convertTodosToDataType = (todos: Todo[]): DataType[] => {
-    return todos.map((todo) => ({
+  const convertTodosToDataType = (todos: Todo[]): any[] => {
+    return todos?.map((todo) => ({
       key: todo.id,
       title: todo.title,
-      startDate: dayjs(todo.period[0]),
-      endDate: dayjs(todo.period[1]),
-      compDate: dayjs(todo.compDate),
+      // startDate: dayjs(todo.period[0]),
+      startDate: todo.period && todo.period[0] ? dayjs(todo.period[0]) : null,
+      // endDate: dayjs(todo.period[1]),
+      endDate: todo.period && todo.period[1] ? dayjs(todo.period[1]) : null,
+      // compDate: dayjs(todo.compDate) || '-',
+      compDate: todo.compDate ? dayjs(todo.compDate) : null,
       status: todo.status,
     }));
   };
