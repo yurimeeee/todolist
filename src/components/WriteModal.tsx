@@ -233,6 +233,7 @@ const WriteModal = ({ updateMode, todoId, open, setOpen }: WriteModalProps) => {
   const [form] = Form.useForm(); // Correctly get the form instance
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isAllDay, setIsAllDay] = useState(false);
+  const [selectedColor, setSelectedColor] = useState('');
 
   const [data, setData] = useState({
     title: '',
@@ -262,6 +263,7 @@ const WriteModal = ({ updateMode, todoId, open, setOpen }: WriteModalProps) => {
           };
           setData(formattedData);
           form.setFieldsValue(formattedData); // Populate the form fields
+          setSelectedColor(toDoData.toDoType);
         }
       } catch (error) {
         console.error('Error getToDoItem data:', (error as Error).message);
@@ -497,11 +499,13 @@ const WriteModal = ({ updateMode, todoId, open, setOpen }: WriteModalProps) => {
                 <ColorChip
                   key={color}
                   $bgColor={color}
+                  $isActive={selectedColor === color}
                   onClick={() => {
                     setData((prev) => ({
                       ...prev,
                       toDoType: color,
                     }));
+                    setSelectedColor(color);
                   }}
                 />
               ))}
@@ -538,7 +542,7 @@ const ColorsPicker = styled.div`
   gap: 10px;
 `;
 // const ColorChip = styled.div<{ bgColor: string; onClick: (color: string) => void }>`
-const ColorChip = styled.div<{ $bgColor: string; onClick: () => void }>`
+const ColorChip = styled.div<{ $bgColor: string; $isActive?: boolean; onClick: () => void }>`
   background-color: ${({ $bgColor }) => $bgColor};
   width: 16px;
   height: 16px;
@@ -555,7 +559,8 @@ const ColorChip = styled.div<{ $bgColor: string; onClick: () => void }>`
     width: 16px;
     height: 16px;
     border: 3px solid ${({ $bgColor }) => $bgColor};
-    opacity: 0;
+    opacity: ${({ $isActive }) => ($isActive ? 0.3 : 0)};
+    /* opacity: 0; */
     transition: border 0.4s;
   }
 
