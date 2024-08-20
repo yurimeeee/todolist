@@ -455,7 +455,7 @@ const WriteModal = ({ updateMode, todoId, open, setOpen }: WriteModalProps) => {
               />
             </Form.Item>
           )}
-          <Form.Item label="우선순위" name="priority" rules={[{ required: true, message: 'Please input your Range!' }]}>
+          <Form.Item label="중요도" name="priority" rules={[{ required: true, message: 'Please input your Range!' }]}>
             <Select
               placeholder="선택"
               style={{ width: 120 }}

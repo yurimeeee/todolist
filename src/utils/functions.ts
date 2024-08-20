@@ -1,7 +1,8 @@
 import { ToDoItem } from "src/types/type";
 import dayjs from 'dayjs';
+import { Dayjs } from 'dayjs';
 
-export const statusFormatter = (status: string) => {
+export const statusFormatter = (status?: string) => {
   switch (status) {
     case 'before':
       return '진행예정';
@@ -16,6 +17,23 @@ export const statusFormatter = (status: string) => {
   }
 };
 
+export const getCalculatedDay = (date: Dayjs | null): number => {
+  if (!date) return 0;
+  const today = dayjs();
+  const diffInDays = date.diff(today, 'day');
+  return diffInDays;
+};
+
+export const renderDday = (date: string | null) => {
+  const calculatedDay = getCalculatedDay(dayjs(date));
+  if (calculatedDay === 0) {
+    return 'D-day';
+  } else if (calculatedDay < 0) {
+    return `D+${calculatedDay * -1}`;
+  } else {
+    return `D-${calculatedDay}`;
+  }
+};
 
 export const tmpData: ToDoItem[] = [
   {

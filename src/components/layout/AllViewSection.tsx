@@ -5,6 +5,7 @@ import ListTable from '@components/ListTable';
 import { tmpData } from '@utils/functions';
 import CustomCard from '@components/CustomCard';
 import { Todo } from 'src/types/type';
+import CustomCalendar2 from '@components/CustomCalendar2';
 
 //   {
 //     key: 1,
@@ -124,7 +125,8 @@ const AllViewSection = ({ data }: AllViewSectionProps) => {
         </CardContainer>
       </CardSection>
       <FlexBox>
-        <CustomCalendar />
+        <CustomCalendar2 data={data} />
+        {/* <CustomCalendar /> */}
         <ListTable data={data} />
       </FlexBox>
     </Wrap>

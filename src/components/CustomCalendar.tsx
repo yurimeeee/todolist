@@ -55,29 +55,62 @@ const CustomCalendar = () => {
     ) : null;
   };
 
-  const dateCellRender = (value: Dayjs) => {
+  // const dateCellRender = (value: Dayjs) => {
+  //   const listData = getListData(value);
+  //   return (
+  //     <ul className="events">
+  //       {listData.map((item) => (
+  //         <li key={item.content}>
+  //           <Badge status={item.type as BadgeProps['status']} text={item.content} />
+  //         </li>
+  //       ))}
+  //     </ul>
+  //   );
+  // };
+
+  // // const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
+  // const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
+  //   if (info.type === 'date') return dateCellRender(current);
+  //   if (info.type === 'month') return monthCellRender(current);
+  //   return info.originNode;
+  // };
+
+  const events = [
+    {
+      date: '2024-08-20',
+      title: 'Event 1',
+      color: 'blue',
+    },
+    {
+      date: '2024-08-21',
+      title: 'Event 2',
+      color: 'green',
+    },
+  ];
+
+  const getListData = (value: any) => {
+    const dateString = value.format('YYYY-MM-DD');
+    return events.filter((event) => event.date === dateString);
+  };
+
+  const dateCellRender = (value: any) => {
     const listData = getListData(value);
     return (
       <ul className="events">
-        {listData.map((item) => (
-          <li key={item.content}>
-            <Badge status={item.type as BadgeProps['status']} text={item.content} />
+        {listData.map((event, index) => (
+          <li key={index}>
+            <Badge color={event.color} text={event.title} />
           </li>
         ))}
       </ul>
     );
   };
 
-  const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
-    if (info.type === 'date') return dateCellRender(current);
-    if (info.type === 'month') return monthCellRender(current);
-    return info.originNode;
-  };
-
   return (
     <ConfigProvider locale={koKR}>
       <Wrap>
-        <Calendar cellRender={cellRender} />
+        <Calendar dateCellRender={dateCellRender} />
+        {/* <Calendar cellRender={cellRender} /> */}
       </Wrap>
     </ConfigProvider>
   );

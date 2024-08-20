@@ -82,6 +82,7 @@ interface CustomDropdownProps {
 }
 
 const CustomDropdown = ({ todoId }: CustomDropdownProps) => {
+  console.log('todoId', todoId);
   const { setToDoList } = toDoListStore();
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 

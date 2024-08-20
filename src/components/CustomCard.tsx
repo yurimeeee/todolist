@@ -6,6 +6,9 @@ import { Todo } from 'src/types/type';
 import CustomDropdown from './CustomDropdown';
 import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
+import { renderDday } from '@utils/functions';
+import DetailViewModal from './DetailViewModal';
+import { useState } from 'react';
 
 interface CustomCardProps {
   data: Todo;
@@ -15,36 +18,20 @@ interface CustomCardProps {
 }
 
 const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCardProps) => {
-  // const getCalculatedDay = (date: Dayjs | null) => {
-  //   let calculatedDay = date?.diff(dayjs(), 'days');
-  //   if (calculatedDay && calculatedDay > 0) {
-  //     return `D-${calculatedDay}`;
-  //   } else if (calculatedDay === 0) {
-  //     return 'D-day';
-  //   } else {
-  //     return `D+${calculatedDay * -1}`;
-  //   }
-  // };
-  const getCalculatedDay = (date: Dayjs | null): number => {
-    if (!date) return 0; // Handle case where date might be null
-    const today = dayjs(); // Assume dayjs is imported and used
-    const diffInDays = date.diff(today, 'day');
-    return diffInDays;
-  };
-
-  const renderDday = () => {
-    const calculatedDay = getCalculatedDay(dayjs(data?.period[1]));
-    if (calculatedDay === 0) {
-      return 'D-day';
-    } else if (calculatedDay < 0) {
-      return `D+${calculatedDay * -1}`;
-    } else {
-      return `D-${calculatedDay}`;
-    }
-  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [todoId, setTodoId] = useState('');
 
   return (
-    <Wrapper width={width} maxWidth={maxWidth} status={data.status}>
+    <Wrapper
+      width={width}
+      maxWidth={maxWidth}
+      status={data.status}
+      // onClick={() => {
+      //   setTodoId(item.id);
+      //   setIsModalOpen(true);
+      //   setDetailData(item);
+      // }}
+    >
       <Card
         size={size}
         title={
@@ -59,9 +46,12 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
       >
         <Contents>
           <p>{data.content}</p>
-          <BadgeBox>{/* <Badge count={renderDday()} showZero color="#a7c3eb" /> */}</BadgeBox>
+          <BadgeBox>
+            <Badge count={renderDday(data.period[1])} showZero color="#a7c3eb" />
+          </BadgeBox>
         </Contents>
       </Card>
+      <DetailViewModal open={isModalOpen} setOpen={setIsModalOpen} todoId={data.id} data={data} />
     </Wrapper>
   );
 };

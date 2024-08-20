@@ -82,11 +82,12 @@ const columns: TableColumnsType<DataType> = [
   },
   {
     title: '관리',
-    key: 'operation',
+    key: 'key',
     align: 'center',
     fixed: 'right',
     width: 52,
-    render: () => <CustomDropdown todoId="dfdsfd" />,
+    // render: (id: string) => <text>{id}</text>,
+    render: (key: any) => <CustomDropdown todoId={key?.key} />,
   },
 ];
 
