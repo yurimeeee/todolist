@@ -1,119 +1,114 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Badge, Calendar, ConfigProvider } from 'antd';
 import { BadgeProps, CalendarProps } from 'antd';
 import { Dayjs } from 'dayjs';
 import koKR from 'antd/es/locale/ko_KR';
 
-const Wrap = styled.div`
-  width: 50vw;
-`;
-const getListData = (value: Dayjs) => {
-  let listData: { type: string; content: string }[] = []; // Specify the type of listData
-  switch (value.date()) {
-    case 8:
-      listData = [
-        { type: 'warning', content: 'This is warning event.' },
-        { type: 'success', content: 'This is usual event.' },
-      ];
-      break;
-    case 10:
-      listData = [
-        { type: 'warning', content: 'This is warning event.' },
-        { type: 'success', content: 'This is usual event.' },
-        { type: 'error', content: 'This is error event.' },
-      ];
-      break;
-    case 15:
-      listData = [
-        { type: 'warning', content: 'This is warning event' },
-        { type: 'success', content: 'This is very long usual event......' },
-        { type: 'error', content: 'This is error event 1.' },
-        { type: 'error', content: 'This is error event 2.' },
-        { type: 'error', content: 'This is error event 3.' },
-        { type: 'error', content: 'This is error event 4.' },
-      ];
-      break;
-    default:
-  }
-  return listData || [];
-};
+import { Calendar, Badge, ConfigProvider } from 'antd';
+import { Todo } from 'src/types/type';
+import DetailViewModal from './DetailViewModal';
+// import 'antd/dist/antd.css';
 
-const getMonthData = (value: Dayjs) => {
-  if (value.month() === 8) {
-    return 1394;
-  }
-};
+interface CustomCalendarProps {
+  data: Todo[];
+}
 
-const CustomCalendar = () => {
-  const monthCellRender = (value: Dayjs) => {
-    const num = getMonthData(value);
-    return num ? (
-      <div className="notes-month">
-        <section>{num}</section>
-        <span>Backlog number</span>
-      </div>
-    ) : null;
+const CustomCalendar = ({ data }: CustomCalendarProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [todoId, setTodoId] = useState('');
+  const [detailData, setDetailData] = useState<Todo | null>(null);
+  // Function to check if a date is within a period
+  const isDateInPeriod = (date: any, start: any, end: any) => {
+    const dateObj = new Date(date);
+    const startObj = new Date(start);
+    const endObj = new Date(end);
+    return dateObj >= startObj && dateObj <= endObj;
   };
-
-  // const dateCellRender = (value: Dayjs) => {
-  //   const listData = getListData(value);
-  //   return (
-  //     <ul className="events">
-  //       {listData.map((item) => (
-  //         <li key={item.content}>
-  //           <Badge status={item.type as BadgeProps['status']} text={item.content} />
-  //         </li>
-  //       ))}
-  //     </ul>
-  //   );
-  // };
-
-  // // const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
-  // const cellRender: CalendarProps<Dayjs>['cellRender'] = (current, info) => {
-  //   if (info.type === 'date') return dateCellRender(current);
-  //   if (info.type === 'month') return monthCellRender(current);
-  //   return info.originNode;
-  // };
-
-  const events = [
-    {
-      date: '2024-08-20',
-      title: 'Event 1',
-      color: 'blue',
-    },
-    {
-      date: '2024-08-21',
-      title: 'Event 2',
-      color: 'green',
-    },
-  ];
 
   const getListData = (value: any) => {
     const dateString = value.format('YYYY-MM-DD');
-    return events.filter((event) => event.date === dateString);
+    // return data?.filter((item) => isDateInPeriod(dateString, item.period[0], item.period[1]));
+    return data?.filter((item) => item.status !== 'cancel')?.filter((item) => isDateInPeriod(dateString, item.period[0], item.period[1]));
   };
 
   const dateCellRender = (value: any) => {
     const listData = getListData(value);
     return (
       <ul className="events">
-        {listData.map((event, index) => (
-          <li key={index}>
-            <Badge color={event.color} text={event.title} />
-          </li>
+        {listData?.slice(0, 3).map((item, index) => (
+          <div
+            key={index}
+            onClick={() => {
+              setTodoId(item.id);
+              setIsModalOpen(true);
+              setDetailData(item);
+            }}
+            style={{ fontSize: '10px' }}
+          >
+            <Badge color={item.toDoType} text={item.title} title={item.title} />
+          </div>
         ))}
       </ul>
     );
   };
 
   return (
-    <ConfigProvider locale={koKR}>
+    <ConfigProvider
+      locale={koKR}
+      theme={{
+        components: {
+          Calendar: {
+            itemActiveBg: '#fafdff',
+          },
+        },
+        token: { controlItemBgHover: '#fafdffb6' },
+      }}
+    >
       <Wrap>
-        <Calendar dateCellRender={dateCellRender} />
+        <Calendar dateCellRender={dateCellRender} mode={'month'} />
         {/* <Calendar cellRender={cellRender} /> */}
+        <DetailViewModal open={isModalOpen} setOpen={setIsModalOpen} todoId={todoId} data={detailData} />
       </Wrap>
     </ConfigProvider>
+    // <div style={{ padding: '20px' }}>
+    //   <Calendar dateCellRender={dateCellRender} />
+    // </div>
   );
 };
 
 export default CustomCalendar;
+
+const Wrap = styled.div`
+  width: 100%;
+
+  ul {
+    display: block;
+    list-style-type: disc;
+    margin-block-start: 0 !important;
+    margin-block-end: 0 !important;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
+    padding-inline-start: 0 !important;
+    /* margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    padding-inline-start: 40px; */
+    unicode-bidi: isolate;
+  }
+
+  .events {
+    width: 100%;
+    max-width: 96px;
+  }
+  .events span {
+    width: 100%;
+    font-size: 12px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ant-radio-group {
+    display: none;
+  }
+`;

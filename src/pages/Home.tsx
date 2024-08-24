@@ -8,11 +8,13 @@ import FloatInfoBtn from '@components/FloatInfoBtn';
 import AllViewSection from '@components/layout/AllViewSection';
 import ListViewSection from '@components/layout/ListViewSection';
 
-import { toDoListStore } from '@store/store';
+import { modalStore, toDoListStore } from '@store/store';
 import { supabase } from '@api/supabaseClient';
+import WriteModal from '@components/WriteModal';
 
 function Home() {
   const { toDoList, setToDoList } = toDoListStore();
+  const { isOpen, setIsOpen, toDoId, isUpateMode } = modalStore();
   const getData = async () => {
     const { data, error } = await supabase.from('todo').select('*');
     setToDoList(data);
@@ -36,7 +38,7 @@ function Home() {
     {
       key: '2',
       label: 'Calendar',
-      children: <CustomCalendar />,
+      children: <CustomCalendar data={toDoList} />,
     },
     {
       key: '3',
@@ -66,6 +68,7 @@ function Home() {
   return (
     <div className="App">
       <TabMenu tabContents={tabContents} onChange={onChange} />
+      <WriteModal open={isOpen} setOpen={setIsOpen} todoId={toDoId} updateMode={isUpateMode} />
       <FloatInfoBtn onClick={info} />
     </div>
   );

@@ -15,7 +15,7 @@ const { TextArea } = Input;
 
 interface WriteModalProps {
   updateMode?: boolean;
-  todoId?: string;
+  todoId?: string | null;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   // onChange: (key: string) => void;

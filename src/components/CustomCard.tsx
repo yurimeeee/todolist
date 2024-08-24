@@ -39,12 +39,22 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
             <Icon>
               <Badge color={data.toDoType} status={data.status === 'progress' ? 'processing' : 'default'} />
             </Icon>
-            {data.title}
+            <Title
+              onClick={() => {
+                setIsModalOpen(true);
+              }}
+            >
+              {data.title}
+            </Title>
           </TitleBox>
         }
         extra={<CustomDropdown todoId={data.id} />}
       >
-        <Contents>
+        <Contents
+          onClick={() => {
+            setIsModalOpen(true);
+          }}
+        >
           <p>{data.content}</p>
           <BadgeBox>
             <Badge count={renderDday(data.period[1])} showZero color="#a7c3eb" />
@@ -72,6 +82,9 @@ const TitleBox = styled.div`
   display: flex;
   gap: 6px;
 `;
+const Title = styled.div`
+  cursor: pointer;
+`;
 const BadgeBox = styled.div`
   display: flex;
   justify-content: end;
@@ -85,4 +98,5 @@ const Icon = styled.div`
 const Contents = styled.div`
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 `;
