@@ -39,6 +39,16 @@ function Signup() {
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
+
+        options: {
+          data: {
+            email: values.email,
+            // user_id: values.user_id,
+            // user_pw: values.password,
+            user_name: values.user_name,
+            avatar_url: '',
+          },
+        },
       });
 
       // if (signUpError) throw signUpError;
@@ -55,7 +65,7 @@ function Signup() {
         },
       ]);
 
-      // if (insertError) throw insertError;
+      if (insertError) throw insertError;
 
       console.log('가입 완료:', signUpData);
     } catch (error) {

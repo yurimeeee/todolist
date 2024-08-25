@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Table, TableColumnsType, MenuProps, Dropdown, Space } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Table, TableColumnsType, Space, Button, Flex, Input } from 'antd';
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 import { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
@@ -7,9 +7,13 @@ import dayjs from 'dayjs';
 import { statusFormatter } from '@utils/functions';
 import CustomDropdown from './CustomDropdown';
 import { Todo } from 'src/types/type';
+import { supabase } from '@api/supabaseClient';
+import { toDoListStore, userInfoStore } from '@store/store';
 
+const { Search } = Input;
 interface ListTableProps {
   data?: Todo[];
+  isActiveDelete?: boolean;
   // onClick: () => void;
 }
 
@@ -19,7 +23,6 @@ interface DataType {
   startDate: Dayjs;
   endDate: Dayjs;
   compDate: Dayjs;
-  // status: string;
   status: 'before' | 'progress' | 'complete' | 'stop' | 'cancel';
 }
 
@@ -100,24 +103,83 @@ const rowSelection = {
     title: record.title,
   }),
 };
-const ListTable = ({ data }: ListTableProps) => {
+const ListTable = ({ isActiveDelete = false }: ListTableProps) => {
+  const { userInfo } = userInfoStore();
+  const [searchText, setSearchText] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const { toDoList, setToDoList } = toDoListStore();
+  const [data, setData] = useState<Todo[]>(toDoList);
+
   // Todo 타입을 DataType으로 변환하는 함수
   const convertTodosToDataType = (todos: Todo[]): any[] => {
     return todos?.map((todo) => ({
       key: todo.id,
       title: todo.title,
-      // startDate: dayjs(todo.period[0]),
       startDate: todo.period && todo.period[0] ? dayjs(todo.period[0]) : null,
-      // endDate: dayjs(todo.period[1]),
       endDate: todo.period && todo.period[1] ? dayjs(todo.period[1]) : null,
-      // compDate: dayjs(todo.compDate) || '-',
       compDate: todo.compDate ? dayjs(todo.compDate) : null,
       status: todo.status,
     }));
   };
 
+  const getData = async (uid?: string) => {
+    const { data, error } = await supabase.from('todo').select('*').eq('uid', uid); // Only fetch rows where the uid matches
+
+    if (error) {
+      console.error('Error fetching data:', error.message);
+    } else {
+      setData(data);
+    }
+  };
+
+  useEffect(() => {
+    getData(userInfo?.id);
+  }, [userInfo?.id]);
+
+  const onSearch = async (value: string) => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.from('todo').select('*').eq('uid', userInfo?.id).or(`title.like.%${value}%,content.like.%${value}%`);
+
+      if (data) setData(data);
+    } catch (error) {
+      console.error('Error fetching data:', (error as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div>
+      <Flex justify="space-between" style={{ marginBottom: '24px' }}>
+        <Flex gap={8}>
+          <Search
+            placeholder="검색어를 입력하세요..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onSearch={onSearch}
+            style={{ width: 240 }}
+            allowClear
+            loading={loading}
+          />
+          <Button
+            type="default"
+            onClick={() => {
+              setSearchText('');
+              setData(toDoList);
+            }}
+          >
+            검색 결과 초기화
+          </Button>
+        </Flex>
+        {isActiveDelete && (
+          <Flex justify="end">
+            <Button type="default" danger>
+              선택 삭제
+            </Button>
+          </Flex>
+        )}
+      </Flex>
       <Table
         rowSelection={{
           ...rowSelection,

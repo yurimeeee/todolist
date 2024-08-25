@@ -1,18 +1,16 @@
 import styled from 'styled-components';
 import { DndContext } from '@dnd-kit/core';
 
-import { tmpData } from '@utils/functions';
-import CustomCard from '@components/CustomCard';
-import { supabase } from '@api/supabaseClient';
-import { useEffect } from 'react';
+import { Flex } from 'antd';
 import { Todo } from 'src/types/type';
+import CustomCard from '@components/CustomCard';
 
 interface BoardViewSectionProps {
   data: Todo[];
 }
 const BoardViewSection = ({ data }: BoardViewSectionProps) => {
   return (
-    <Wrap>
+    <Flex gap={16}>
       <CardContainer>
         <DndContext>
           {/* <Droppable>
@@ -50,16 +48,12 @@ const BoardViewSection = ({ data }: BoardViewSectionProps) => {
             <CustomCard data={item} key={idx} />
           ))}
       </CardContainer>
-    </Wrap>
+    </Flex>
   );
 };
 
 export default BoardViewSection;
 
-const Wrap = styled.div`
-  display: flex;
-  gap: 16px;
-`;
 const CardContainer = styled.div`
   display: flex;
   flex-direction: column;

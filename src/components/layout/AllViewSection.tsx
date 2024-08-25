@@ -1,8 +1,10 @@
 import styled from 'styled-components';
-import CustomCalendar from '@components/CustomCalendar';
+import { Flex } from 'antd';
+
+import { Todo } from 'src/types/type';
 import ListTable from '@components/ListTable';
 import CustomCard from '@components/CustomCard';
-import { Todo } from 'src/types/type';
+import CustomCalendar from '@components/CustomCalendar';
 
 interface AllViewSectionProps {
   data: Todo[];
@@ -11,7 +13,7 @@ interface AllViewSectionProps {
 const AllViewSection = ({ data }: AllViewSectionProps) => {
   return (
     <Wrap>
-      <CardSection>
+      <Flex gap={16}>
         <CardContainer>
           <Header>진행예정</Header>
           {data
@@ -48,15 +50,15 @@ const AllViewSection = ({ data }: AllViewSectionProps) => {
               <CustomCard data={item} key={idx} />
             ))}
         </CardContainer>
-      </CardSection>
-      <FlexBox>
+      </Flex>
+      <Flex gap={16}>
         <CalendarBox>
           <CustomCalendar data={data} />
         </CalendarBox>
         <ListBox>
-          <ListTable data={data} />
+          <ListTable />
         </ListBox>
-      </FlexBox>
+      </Flex>
     </Wrap>
   );
 };
@@ -66,10 +68,6 @@ export default AllViewSection;
 const Wrap = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
-`;
-const CardSection = styled.div`
-  display: flex;
   gap: 16px;
 `;
 const CardContainer = styled.div`
@@ -84,10 +82,6 @@ const Header = styled.div`
   justify-content: center;
   align-items: center;
   background: #ebf6ff;
-`;
-const FlexBox = styled.div`
-  display: flex;
-  gap: 16px;
 `;
 const CalendarBox = styled.div`
   width: 55%;

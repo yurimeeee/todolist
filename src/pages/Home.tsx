@@ -8,21 +8,28 @@ import FloatInfoBtn from '@components/FloatInfoBtn';
 import AllViewSection from '@components/layout/AllViewSection';
 import ListViewSection from '@components/layout/ListViewSection';
 
-import { modalStore, toDoListStore } from '@store/store';
+import { modalStore, toDoListStore, userInfoStore } from '@store/store';
 import { supabase } from '@api/supabaseClient';
 import WriteModal from '@components/WriteModal';
 
 function Home() {
+  const { userInfo } = userInfoStore();
   const { toDoList, setToDoList } = toDoListStore();
   const { isOpen, setIsOpen, toDoId, isUpateMode } = modalStore();
-  const getData = async () => {
-    const { data, error } = await supabase.from('todo').select('*');
+
+  const getData = async (uid?: string) => {
+    const { data, error } = await supabase.from('todo').select('*').eq('uid', uid); // Only fetch rows where the uid matches
+
+    if (error) {
+      console.error('Error fetching data:', error.message);
+      return;
+    }
+
     setToDoList(data);
   };
 
   useEffect(() => {
-    getData();
-    console.log(toDoList);
+    getData(userInfo?.id);
   }, []);
 
   const onChange = (key: string) => {
@@ -43,7 +50,7 @@ function Home() {
     {
       key: '3',
       label: 'List',
-      children: <ListViewSection />,
+      children: <ListViewSection data={toDoList} />,
     },
     {
       key: '4',

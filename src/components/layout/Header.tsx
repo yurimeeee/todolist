@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Button } from 'antd';
+import { Button, Flex } from 'antd';
 
 import { supabase } from '@api/supabaseClient';
 import { modalStore, userInfoStore } from '@store/store';
@@ -18,7 +18,7 @@ const Header = () => {
     <Container>
       {userInfo?.email}{' '}
       {userInfo && (
-        <ButtonWrap>
+        <Flex gap={8}>
           <Button
             type="primary"
             ghost
@@ -32,7 +32,7 @@ const Header = () => {
           <Button type="primary" onClick={handleClickSignOut}>
             로그아웃
           </Button>
-        </ButtonWrap>
+        </Flex>
       )}
     </Container>
   );
@@ -46,8 +46,4 @@ const Container = styled.div`
   max-width: 1440px;
   margin: 0 auto;
   /* padding: 4px 16px; */
-`;
-const ButtonWrap = styled.div`
-  display: flex;
-  gap: 8px;
 `;

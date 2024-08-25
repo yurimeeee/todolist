@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Badge, Card } from 'antd';
+import { Badge, Card, Flex } from 'antd';
 import { CardSize } from 'antd/es/card/Card';
 
 import { Todo } from 'src/types/type';
@@ -19,7 +19,6 @@ interface CustomCardProps {
 
 const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCardProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [todoId, setTodoId] = useState('');
 
   return (
     <Wrapper
@@ -35,7 +34,7 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
       <Card
         size={size}
         title={
-          <TitleBox>
+          <Flex gap={6}>
             <Icon>
               <Badge color={data.toDoType} status={data.status === 'progress' ? 'processing' : 'default'} />
             </Icon>
@@ -46,7 +45,7 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
             >
               {data.title}
             </Title>
-          </TitleBox>
+          </Flex>
         }
         extra={<CustomDropdown todoId={data.id} />}
       >
@@ -56,9 +55,9 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
           }}
         >
           <p>{data.content}</p>
-          <BadgeBox>
+          <Flex justify="end">
             <Badge count={renderDday(data.period[1])} showZero color="#a7c3eb" />
-          </BadgeBox>
+          </Flex>
         </Contents>
       </Card>
       <DetailViewModal open={isModalOpen} setOpen={setIsModalOpen} todoId={data.id} data={data} />
@@ -77,17 +76,8 @@ const Wrapper = styled.div<{ width?: string; maxWidth?: string; status?: string 
     background: ${({ status }) => (status === 'cancel' ? '#f7f7f7' : '#FFF')};
   }
 `;
-
-const TitleBox = styled.div`
-  display: flex;
-  gap: 6px;
-`;
 const Title = styled.div`
   cursor: pointer;
-`;
-const BadgeBox = styled.div`
-  display: flex;
-  justify-content: end;
 `;
 const Icon = styled.div`
   display: flex;

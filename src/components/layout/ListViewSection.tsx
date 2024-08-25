@@ -1,9 +1,15 @@
 import ListTable from '@components/ListTable';
+import { Button } from 'antd';
+import { Todo } from 'src/types/type';
 
-const ListViewSection = () => {
+interface ListViewSectionProps {
+  data: Todo[];
+}
+
+const ListViewSection = ({ data }: ListViewSectionProps) => {
   return (
     <>
-      <ListTable />
+      <ListTable data={data} isActiveDelete />
     </>
   );
 };
