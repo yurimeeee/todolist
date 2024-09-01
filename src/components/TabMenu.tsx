@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Tabs, Button, TabsProps } from 'antd';
+import { Tabs, TabsProps } from 'antd';
 
 const Wrap = styled.div`
   max-width: 1440px;
@@ -8,13 +8,12 @@ const Wrap = styled.div`
 
 interface TabMenuProps {
   tabContents: TabsProps['items'];
-  onChange: (key: string) => void;
 }
 
-const TabMenu = ({ tabContents, onChange }: TabMenuProps) => {
+const TabMenu = ({ tabContents }: TabMenuProps) => {
   return (
     <Wrap>
-      <Tabs defaultActiveKey="1" items={tabContents} onChange={onChange} />
+      <Tabs defaultActiveKey="1" items={tabContents} />
     </Wrap>
   );
 };

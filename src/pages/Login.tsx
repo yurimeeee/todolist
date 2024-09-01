@@ -66,30 +66,30 @@ function Login() {
     console.log('Failed:', errorInfo);
   };
 
-  async function getUserInfo() {
-    // Get the user session and user details
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
+  // async function getUserInfo() {
+  //   // Get the user session and user details
+  //   const {
+  //     data: { user },
+  //     error,
+  //   } = await supabase.auth.getUser();
 
-    if (error) {
-      console.error('Error fetching user:', error.message);
-      return null;
-    }
+  //   if (error) {
+  //     console.error('Error fetching user:', error.message);
+  //     return null;
+  //   }
 
-    // If user exists, log their information
-    if (user) {
-      setUserInfo(user);
-      return user;
-    }
+  //   // If user exists, log their information
+  //   if (user) {
+  //     setUserInfo(user);
+  //     return user;
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+  // useEffect(() => {
+  //   getUserInfo();
+  // }, []);
 
   return (
     <div>

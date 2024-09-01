@@ -73,6 +73,21 @@ const WriteModal = ({ updateMode, todoId, open, setOpen }: WriteModalProps) => {
   }, [open]);
 
   const handleOk = async () => {
+    if (!data.title) {
+      message.error('제목을 입력해주세요.');
+      return;
+    }
+
+    if (!data.content) {
+      message.error('내용을 입력해주세요.');
+      return;
+    }
+
+    if (!data.period || !data.period[0] || !data.period[1]) {
+      message.error('기간을 설정해주세요.');
+      return;
+    }
+
     try {
       setConfirmLoading(true);
       const payload = {
@@ -208,7 +223,7 @@ const WriteModal = ({ updateMode, todoId, open, setOpen }: WriteModalProps) => {
             <TextArea onChange={onChange} name="content" value={data.content} />
           </Form.Item>
           <Form.Item label="기간" name="startDate" rules={[{ required: true, message: 'Please input your Range!' }]}>
-            <RangePicker value={data.period} onChange={handleDateChange} />
+            <RangePicker value={data.period} onChange={handleDateChange} placeholder={['시작일', '종료일']} />
             <Button
               type={isAllDay ? 'primary' : 'default'}
               ghost={isAllDay}

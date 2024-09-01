@@ -1,7 +1,7 @@
 import { Dropdown, Space } from 'antd';
 import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
 
-import { modalStore } from '@store/store';
+import { modalStore, userInfoStore } from '@store/store';
 import useDeleteToDo from '@hooks/useDeleteToDo';
 
 interface CustomDropdownProps {
@@ -9,6 +9,7 @@ interface CustomDropdownProps {
 }
 
 const CustomDropdown = ({ todoId }: CustomDropdownProps) => {
+  const { userInfo } = userInfoStore();
   const { setIsOpen, setToDoId, setIsUpateMode } = modalStore();
   const { deleteToDo } = useDeleteToDo();
 
@@ -28,7 +29,7 @@ const CustomDropdown = ({ todoId }: CustomDropdownProps) => {
       danger: true,
       icon: <DeleteOutlined />,
       label: '삭제',
-      onClick: () => deleteToDo(todoId),
+      onClick: () => deleteToDo(todoId, userInfo?.id),
     },
   ];
 

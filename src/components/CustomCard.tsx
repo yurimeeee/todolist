@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { Badge, Card, Flex } from 'antd';
 import { CardSize } from 'antd/es/card/Card';
+import { Draggable, Droppable } from '@hello-pangea/dnd';
 
 import { Todo } from 'src/types/type';
 import CustomDropdown from './CustomDropdown';
@@ -8,7 +9,7 @@ import dayjs from 'dayjs';
 import { Dayjs } from 'dayjs';
 import { renderDday } from '@utils/functions';
 import DetailViewModal from './DetailViewModal';
-import { useState } from 'react';
+import { detailModalStore } from '@store/store';
 
 interface CustomCardProps {
   data: Todo;
@@ -18,19 +19,10 @@ interface CustomCardProps {
 }
 
 const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCardProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { setIsDetailOpen, setDetailId } = detailModalStore();
 
   return (
-    <Wrapper
-      width={width}
-      maxWidth={maxWidth}
-      status={data.status}
-      // onClick={() => {
-      //   setTodoId(item.id);
-      //   setIsModalOpen(true);
-      //   setDetailData(item);
-      // }}
-    >
+    <Wrapper width={width} maxWidth={maxWidth} status={data.status}>
       <Card
         size={size}
         title={
@@ -40,7 +32,8 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
             </Icon>
             <Title
               onClick={() => {
-                setIsModalOpen(true);
+                setDetailId(data.id);
+                setIsDetailOpen(true);
               }}
             >
               {data.title}
@@ -51,7 +44,8 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
       >
         <Contents
           onClick={() => {
-            setIsModalOpen(true);
+            setDetailId(data.id);
+            setIsDetailOpen(true);
           }}
         >
           <p>{data.content}</p>
@@ -60,7 +54,6 @@ const CustomCard = ({ data, width = '100%', maxWidth, size = 'small' }: CustomCa
           </Flex>
         </Contents>
       </Card>
-      <DetailViewModal open={isModalOpen} setOpen={setIsModalOpen} todoId={data.id} data={data} />
     </Wrapper>
   );
 };

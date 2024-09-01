@@ -4,52 +4,159 @@ import { DndContext } from '@dnd-kit/core';
 import { Flex } from 'antd';
 import { Todo } from 'src/types/type';
 import CustomCard from '@components/CustomCard';
-
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 interface BoardViewSectionProps {
   data: Todo[];
+  setData: React.Dispatch<React.SetStateAction<Todo[]>>;
 }
-const BoardViewSection = ({ data }: BoardViewSectionProps) => {
+const BoardViewSection = ({ data, setData }: BoardViewSectionProps) => {
+  // const onDragEnd = (result: DropResult) => {
+  //   // 드래그 앤 드롭 완료 후 처리할 로직
+  // };
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+
+    // 드래그가 시작된 위치와 드래그가 끝난 위치가 같지 않으면 처리
+    if (!destination || source.droppableId === destination.droppableId) {
+      return;
+    }
+
+    // 드래그된 카드의 index
+    const draggedIndex = source.index;
+
+    // 드래그된 카드 데이터
+    const draggedItem = data.find((_, index) => index === draggedIndex);
+
+    if (draggedItem) {
+      // 새로운 상태를 드래그된 위치에 따라 설정
+      let newStatus = '';
+      switch (destination.droppableId) {
+        case 'progress':
+          newStatus = 'progress';
+          break;
+        case 'complete':
+          newStatus = 'complete';
+          break;
+        case 'cancel':
+          newStatus = 'cancel';
+          break;
+        case 'before':
+          newStatus = 'before';
+          break;
+        default:
+          return;
+      }
+
+      // 카드의 상태를 업데이트
+      const updatedData = data.map((item, index) => (index === draggedIndex ? { ...item, status: newStatus } : item));
+
+      // 업데이트된 데이터를 상태로 설정
+      setData(updatedData as any);
+    }
+  };
+
+  const getHeaderTitle = (status: string) => {
+    switch (status) {
+      case 'before':
+        return '진행예정';
+      case 'progress':
+        return '진행중';
+      case 'complete':
+        return '완료';
+      case 'cancel':
+        return '보류';
+      default:
+        return '';
+    }
+  };
+
   return (
     <Flex gap={16}>
-      <CardContainer>
-        <DndContext>
-          {/* <Droppable>
-            <Draggable></Draggable>
-          </Droppable> */}
-        </DndContext>
-        <Header>진행예정</Header>
-        {data
-          ?.filter((item) => item.status === 'before')
-          .map((item, idx) => (
-            <CustomCard data={item} key={idx} />
-          ))}
-      </CardContainer>
-      <CardContainer>
-        <Header>진행중</Header>
-        {data
-          ?.filter((item) => item.status === 'progress')
-          .map((item, idx) => (
-            <CustomCard data={item} key={idx} />
-          ))}
-      </CardContainer>
-      <CardContainer>
-        <Header>완료</Header>
-        {data
-          ?.filter((item) => item.status === 'complete')
-          .map((item, idx) => (
-            <CustomCard data={item} key={idx} />
-          ))}
-      </CardContainer>
-      <CardContainer>
-        <Header>보류</Header>
-        {data
-          ?.filter((item) => item.status === 'cancel')
-          .map((item, idx) => (
-            <CustomCard data={item} key={idx} />
-          ))}
-      </CardContainer>
+      {['before', 'progress', 'complete', 'cancel'].map((status) => (
+        <CardContainer key={status}>
+          <Header>{getHeaderTitle(status)}</Header>
+          <Droppable droppableId={status}>
+            {(provided) => (
+              <div ref={provided.innerRef} {...provided.droppableProps}>
+                {data
+                  ?.filter((item) => item.status === status)
+                  .map((item, index) => (
+                    <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
+                      {(provided) => (
+                        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                          <CustomCard data={item} />
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </CardContainer>
+      ))}
     </Flex>
   );
+  // return (
+  //   <Flex gap={16}>
+  //     <CardContainer>
+  //       <Header>진행중</Header>
+  //       <DragDropContext onDragEnd={onDragEnd}>
+  //         <Droppable droppableId="droppable">
+  //           {(provided) => (
+  //             <div ref={provided.innerRef} {...provided.droppableProps}>
+  //               {data
+  //                 ?.filter((item) => item.status === 'before')
+  //                 .map((item, index) => (
+  //                   <Draggable key={index} draggableId={item.toString()} index={index}>
+  //                     {(provided) => (
+  //                       <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+  //                         <CustomCard data={item} key={index} />
+  //                       </div>
+  //                     )}
+  //                   </Draggable>
+  //                 ))}
+  //               {provided.placeholder}
+  //             </div>
+  //           )}
+  //         </Droppable>
+  //       </DragDropContext>
+  //     </CardContainer>
+  //     {/* <CardContainer>
+  //       <Header>진행예정</Header>
+  //       {data
+  //         ?.filter((item) => item.status === 'before')
+  //         .map((item, idx) => (
+  //           <CustomCard data={item} key={idx} />
+  //         ))}
+  //     </CardContainer> */}
+  //     <CardContainer>
+  //       <Header>진행중</Header>
+  //       {data
+  //         ?.filter((item) => item.status === 'progress')
+  //         .map((item, idx) => (
+  //           <CustomCard data={item} key={idx} />
+  //         ))}
+  //     </CardContainer>
+  //     <CardContainer>
+  //       <Header>완료</Header>
+  //       {data
+  //         ?.filter((item) => item.status === 'complete')
+  //         .map((item, idx) => (
+  //           <CustomCard data={item} key={idx} />
+  //         ))}
+  //     </CardContainer>
+  //     <CardContainer>
+  //       <Header>보류</Header>
+  //       {data
+  //         ?.filter((item) => item.status === 'cancel')
+  //         .map((item, idx) => (
+  //           <CustomCard data={item} key={idx} />
+  //         ))}
+  //     </CardContainer>
+  //   </Flex>
+  // );
 };
 
 export default BoardViewSection;

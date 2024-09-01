@@ -8,7 +8,8 @@ import { statusFormatter } from '@utils/functions';
 import CustomDropdown from './CustomDropdown';
 import { Todo } from 'src/types/type';
 import { supabase } from '@api/supabaseClient';
-import { toDoListStore, userInfoStore } from '@store/store';
+import { detailModalStore, toDoListStore, userInfoStore } from '@store/store';
+import useDeleteToDo from '@hooks/useDeleteToDo';
 
 const { Search } = Input;
 interface ListTableProps {
@@ -27,88 +28,95 @@ interface DataType {
 }
 
 // const columns: TableColumnsType<DataType> = [
-const columns: TableColumnsType<DataType> = [
-  {
-    title: '할일',
-    dataIndex: 'title',
-    render: (text: string) => <a>{text}</a>,
-  },
-  {
-    title: '시작일',
-    dataIndex: 'startDate',
-    align: 'center',
-    render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
-    sorter: (a, b) => a.startDate.unix() - b.startDate.unix(),
-  },
-  {
-    title: '목표일',
-    dataIndex: 'endDate',
-    align: 'center',
-    render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
-    sorter: (a, b) => a.endDate.unix() - b.endDate.unix(),
-  },
-  {
-    title: '완료일',
-    dataIndex: 'compDate',
-    align: 'center',
-    render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
-    sorter: (a, b) => a.compDate.unix() - b.compDate.unix(),
-  },
-  {
-    title: '상태',
-    dataIndex: 'status',
-    align: 'center',
-    filters: [
-      {
-        text: '진행예정',
-        value: 'before',
-      },
-      {
-        text: '진행중',
-        value: 'progress',
-      },
-      {
-        text: '완료',
-        value: 'complete',
-      },
-      {
-        text: '일시정지',
-        value: 'stop',
-      },
-      {
-        text: '보류',
-        value: 'cancel',
-      },
-    ],
-    onFilter: (value, record) => record.status.indexOf(value as string) === 0,
-    render: (status: string) => statusFormatter(status),
-  },
-  {
-    title: '관리',
-    key: 'key',
-    align: 'center',
-    fixed: 'right',
-    width: 52,
-    // render: (id: string) => <text>{id}</text>,
-    render: (key: any) => <CustomDropdown todoId={key?.key} />,
-  },
-];
 
-const rowSelection = {
-  onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
-    // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-  },
-  getCheckboxProps: (record: DataType) => ({
-    disabled: record.title === 'Disabled User', // Column configuration not to be checked
-    title: record.title,
-  }),
-};
 const ListTable = ({ isActiveDelete = false }: ListTableProps) => {
   const { userInfo } = userInfoStore();
+  const { setIsDetailOpen, setDetailId, setTodoData } = detailModalStore();
+
   const [searchText, setSearchText] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const { toDoList, setToDoList } = toDoListStore();
   const [data, setData] = useState<Todo[]>(toDoList);
+  const [checkedList, setCheckedList] = useState<React.Key[]>([]);
+  const { deleteToDo } = useDeleteToDo();
+
+  const columns: TableColumnsType<DataType> = [
+    {
+      title: '할일',
+      dataIndex: 'title',
+      // render: (text: string) => <a>{text}</a>,
+      render: (text: string, record: DataType) => (
+        <a
+          onClick={() => {
+            setDetailId(record.key as string);
+            setIsDetailOpen(true);
+            setTodoData(record as any);
+          }}
+        >
+          {text}
+        </a>
+      ),
+    },
+    {
+      title: '시작일',
+      dataIndex: 'startDate',
+      align: 'center',
+      render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
+      sorter: (a, b) => a.startDate.unix() - b.startDate.unix(),
+    },
+    {
+      title: '목표일',
+      dataIndex: 'endDate',
+      align: 'center',
+      render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
+      sorter: (a, b) => a.endDate.unix() - b.endDate.unix(),
+    },
+    {
+      title: '완료일',
+      dataIndex: 'compDate',
+      align: 'center',
+      render: (date: Dayjs) => (date ? date.format('YYYY-MM-DD') : '-'),
+      sorter: (a, b) => a.compDate.unix() - b.compDate.unix(),
+    },
+    {
+      title: '상태',
+      dataIndex: 'status',
+      align: 'center',
+      filters: [
+        {
+          text: '진행예정',
+          value: 'before',
+        },
+        {
+          text: '진행중',
+          value: 'progress',
+        },
+        {
+          text: '완료',
+          value: 'complete',
+        },
+        {
+          text: '일시정지',
+          value: 'stop',
+        },
+        {
+          text: '보류',
+          value: 'cancel',
+        },
+      ],
+      onFilter: (value, record) => record.status.indexOf(value as string) === 0,
+      render: (status: string) => statusFormatter(status),
+    },
+    {
+      title: '관리',
+      key: 'key',
+      align: 'center',
+      fixed: 'right',
+      width: 52,
+      // render: (id: string) => <text>{id}</text>,
+      render: (key: any) => <CustomDropdown todoId={key?.key} />,
+    },
+  ];
 
   // Todo 타입을 DataType으로 변환하는 함수
   const convertTodosToDataType = (todos: Todo[]): any[] => {
@@ -134,7 +142,7 @@ const ListTable = ({ isActiveDelete = false }: ListTableProps) => {
 
   useEffect(() => {
     getData(userInfo?.id);
-  }, [userInfo?.id]);
+  }, [userInfo?.id, toDoList]);
 
   const onSearch = async (value: string) => {
     setLoading(true);
@@ -147,6 +155,17 @@ const ListTable = ({ isActiveDelete = false }: ListTableProps) => {
     } finally {
       setLoading(false);
     }
+  };
+  const rowSelection = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+      // console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+      console.log(selectedRowKeys);
+      setCheckedList(selectedRowKeys);
+    },
+    getCheckboxProps: (record: DataType) => ({
+      disabled: record.title === 'Disabled User', // Column configuration not to be checked
+      title: record.title,
+    }),
   };
 
   return (
@@ -174,7 +193,7 @@ const ListTable = ({ isActiveDelete = false }: ListTableProps) => {
         </Flex>
         {isActiveDelete && (
           <Flex justify="end">
-            <Button type="default" danger>
+            <Button type="default" danger onClick={() => deleteToDo(checkedList, userInfo?.id)}>
               선택 삭제
             </Button>
           </Flex>

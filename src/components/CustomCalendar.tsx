@@ -1,23 +1,18 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { BadgeProps, CalendarProps } from 'antd';
-import { Dayjs } from 'dayjs';
 import koKR from 'antd/es/locale/ko_KR';
 
 import { Calendar, Badge, ConfigProvider } from 'antd';
 import { Todo } from 'src/types/type';
-import DetailViewModal from './DetailViewModal';
-// import 'antd/dist/antd.css';
+import { detailModalStore } from '@store/store';
 
 interface CustomCalendarProps {
   data: Todo[];
 }
 
 const CustomCalendar = ({ data }: CustomCalendarProps) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [todoId, setTodoId] = useState('');
-  const [detailData, setDetailData] = useState<Todo | null>(null);
-  // Function to check if a date is within a period
+  const { setIsDetailOpen, setDetailId } = detailModalStore();
+
   const isDateInPeriod = (date: any, start: any, end: any) => {
     const dateObj = new Date(date);
     const startObj = new Date(start);
@@ -27,7 +22,6 @@ const CustomCalendar = ({ data }: CustomCalendarProps) => {
 
   const getListData = (value: any) => {
     const dateString = value.format('YYYY-MM-DD');
-    // return data?.filter((item) => isDateInPeriod(dateString, item.period[0], item.period[1]));
     return data?.filter((item) => item.status !== 'cancel')?.filter((item) => isDateInPeriod(dateString, item.period[0], item.period[1]));
   };
 
@@ -39,9 +33,8 @@ const CustomCalendar = ({ data }: CustomCalendarProps) => {
           <div
             key={index}
             onClick={() => {
-              setTodoId(item.id);
-              setIsModalOpen(true);
-              setDetailData(item);
+              setDetailId(item.id);
+              setIsDetailOpen(true);
             }}
             style={{ fontSize: '10px' }}
           >
@@ -67,7 +60,6 @@ const CustomCalendar = ({ data }: CustomCalendarProps) => {
       <Wrap>
         <Calendar dateCellRender={dateCellRender} mode={'month'} />
         {/* <Calendar cellRender={cellRender} /> */}
-        <DetailViewModal open={isModalOpen} setOpen={setIsModalOpen} todoId={todoId} data={detailData} />
       </Wrap>
     </ConfigProvider>
     // <div style={{ padding: '20px' }}>
@@ -89,11 +81,6 @@ const Wrap = styled.div`
     margin-inline-start: 0;
     margin-inline-end: 0;
     padding-inline-start: 0 !important;
-    /* margin-block-start: 1em;
-    margin-block-end: 1em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    padding-inline-start: 40px; */
     unicode-bidi: isolate;
   }
 
