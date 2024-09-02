@@ -1,22 +1,19 @@
 import styled from 'styled-components';
 import { DndContext } from '@dnd-kit/core';
 
-import { Flex } from 'antd';
+import { Flex, message } from 'antd';
 import { Todo } from 'src/types/type';
 import CustomCard from '@components/CustomCard';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { supabase } from '@api/supabaseClient';
 interface BoardViewSectionProps {
   data: Todo[];
   setData: React.Dispatch<React.SetStateAction<Todo[]>>;
 }
 const BoardViewSection = ({ data, setData }: BoardViewSectionProps) => {
-  // const onDragEnd = (result: DropResult) => {
-  //   // 드래그 앤 드롭 완료 후 처리할 로직
-  // };
-
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
-
+  const onDragEnd = async (result: DropResult) => {
+    const { source, destination, draggableId } = result;
+    console.log(result);
     // 드래그가 시작된 위치와 드래그가 끝난 위치가 같지 않으면 처리
     if (!destination || source.droppableId === destination.droppableId) {
       return;
@@ -48,6 +45,17 @@ const BoardViewSection = ({ data, setData }: BoardViewSectionProps) => {
           return;
       }
 
+      try {
+        const { error } = await supabase.from('todo').update({ status: newStatus }).eq('id', draggableId).select();
+        if (error) throw error;
+
+        const { data: toDoData } = await supabase.from('todo').select('*');
+        setData(toDoData as any);
+        message.success(`${getHeaderTitle(newStatus)}(으)로 상태가 변경되었습니다.`, 0.7);
+      } catch (error) {
+        console.error('Error inserting data:', (error as Error).message);
+      }
+
       // 카드의 상태를 업데이트
       const updatedData = data.map((item, index) => (index === draggedIndex ? { ...item, status: newStatus } : item));
 
@@ -72,91 +80,34 @@ const BoardViewSection = ({ data, setData }: BoardViewSectionProps) => {
   };
 
   return (
-    <Flex gap={16}>
-      {['before', 'progress', 'complete', 'cancel'].map((status) => (
-        <CardContainer key={status}>
-          <Header>{getHeaderTitle(status)}</Header>
-          <Droppable droppableId={status}>
-            {(provided) => (
-              <div ref={provided.innerRef} {...provided.droppableProps}>
-                {data
-                  ?.filter((item) => item.status === status)
-                  .map((item, index) => (
-                    <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
-                      {(provided) => (
-                        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                          <CustomCard data={item} />
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </CardContainer>
-      ))}
-    </Flex>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Flex gap={16}>
+        {['before', 'progress', 'complete', 'cancel'].map((status) => (
+          <CardContainer key={status}>
+            <Header>{getHeaderTitle(status)}</Header>
+            <CustomDroppable droppableId={status}>
+              {(provided) => (
+                <div ref={provided.innerRef} {...provided.droppableProps}>
+                  {data
+                    ?.filter((item) => item.status === status)
+                    .map((item, index) => (
+                      <Draggable key={item.id} draggableId={item.id.toString()} index={index}>
+                        {(provided) => (
+                          <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                            <CustomCard data={item} />
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </CustomDroppable>
+          </CardContainer>
+        ))}
+      </Flex>
+    </DragDropContext>
   );
-  // return (
-  //   <Flex gap={16}>
-  //     <CardContainer>
-  //       <Header>진행중</Header>
-  //       <DragDropContext onDragEnd={onDragEnd}>
-  //         <Droppable droppableId="droppable">
-  //           {(provided) => (
-  //             <div ref={provided.innerRef} {...provided.droppableProps}>
-  //               {data
-  //                 ?.filter((item) => item.status === 'before')
-  //                 .map((item, index) => (
-  //                   <Draggable key={index} draggableId={item.toString()} index={index}>
-  //                     {(provided) => (
-  //                       <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-  //                         <CustomCard data={item} key={index} />
-  //                       </div>
-  //                     )}
-  //                   </Draggable>
-  //                 ))}
-  //               {provided.placeholder}
-  //             </div>
-  //           )}
-  //         </Droppable>
-  //       </DragDropContext>
-  //     </CardContainer>
-  //     {/* <CardContainer>
-  //       <Header>진행예정</Header>
-  //       {data
-  //         ?.filter((item) => item.status === 'before')
-  //         .map((item, idx) => (
-  //           <CustomCard data={item} key={idx} />
-  //         ))}
-  //     </CardContainer> */}
-  //     <CardContainer>
-  //       <Header>진행중</Header>
-  //       {data
-  //         ?.filter((item) => item.status === 'progress')
-  //         .map((item, idx) => (
-  //           <CustomCard data={item} key={idx} />
-  //         ))}
-  //     </CardContainer>
-  //     <CardContainer>
-  //       <Header>완료</Header>
-  //       {data
-  //         ?.filter((item) => item.status === 'complete')
-  //         .map((item, idx) => (
-  //           <CustomCard data={item} key={idx} />
-  //         ))}
-  //     </CardContainer>
-  //     <CardContainer>
-  //       <Header>보류</Header>
-  //       {data
-  //         ?.filter((item) => item.status === 'cancel')
-  //         .map((item, idx) => (
-  //           <CustomCard data={item} key={idx} />
-  //         ))}
-  //     </CardContainer>
-  //   </Flex>
-  // );
 };
 
 export default BoardViewSection;
@@ -173,4 +124,10 @@ const Header = styled.div`
   align-items: center;
   height: 40px;
   background: #ebf6ff;
+`;
+const CustomDroppable = styled(Droppable)`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 `;
