@@ -36,7 +36,8 @@ function Login() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'http://localhost:3000',
+        // redirectTo: 'http://localhost:3000',
+        redirectTo: 'https://todoall.vercel.app/',
       },
 
       // token: response.credential,
