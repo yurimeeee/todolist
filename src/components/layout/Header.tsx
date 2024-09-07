@@ -4,6 +4,7 @@ import { Button, Flex } from 'antd';
 import { supabase } from '@api/supabaseClient';
 import { modalStore, userInfoStore } from '@store/store';
 import { PlusOutlined } from '@ant-design/icons';
+import ToDoAllSVG from '@assets/img/ToDoAllSVG';
 
 const Header = () => {
   const { userInfo, setUserInfo } = userInfoStore();
@@ -16,9 +17,10 @@ const Header = () => {
 
   return (
     <Container>
-      {userInfo?.email}{' '}
+      <ToDoAllSVG />
       {userInfo && (
-        <Flex gap={8}>
+        <Flex gap={8} align="center">
+          {userInfo.email}{' '}
           <Button
             type="primary"
             ghost
@@ -45,5 +47,9 @@ const Container = styled.div`
   justify-content: space-between;
   max-width: 1440px;
   margin: 0 auto;
-  /* padding: 4px 16px; */
+`;
+const LogoWrap = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 20px;
 `;

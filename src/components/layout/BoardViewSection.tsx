@@ -11,56 +11,102 @@ interface BoardViewSectionProps {
   setData: React.Dispatch<React.SetStateAction<Todo[]>>;
 }
 const BoardViewSection = ({ data, setData }: BoardViewSectionProps) => {
+  // const onDragEnd = async (result: DropResult) => {
+  //   const { source, destination, draggableId } = result;
+  //   console.log(result);
+  //   // 드래그가 시작된 위치와 드래그가 끝난 위치가 같지 않으면 처리
+  //   if (!destination || source.droppableId === destination.droppableId) {
+  //     console.log('드래그가 시작된 위치와 드래그가 끝난 위치가 같지 않음');
+  //     return;
+  //   }
+
+  //   // 드래그된 카드의 index
+  //   const draggedIndex = source.index;
+  //   console.log('드래그된 카드의 index', draggedIndex);
+  //   // 드래그된 카드 데이터
+  //   const draggedItem = data.find((_, index) => index === draggedIndex);
+  //   console.log('드래그된 카드의 데이터', draggedItem);
+  //   if (draggedItem) {
+  //     // 새로운 상태를 드래그된 위치에 따라 설정
+  //     let newStatus = '';
+  //     switch (destination.droppableId) {
+  //       case 'progress':
+  //         newStatus = 'progress';
+  //         break;
+  //       case 'complete':
+  //         newStatus = 'complete';
+  //         break;
+  //       case 'cancel':
+  //         newStatus = 'cancel';
+  //         break;
+  //       case 'before':
+  //         newStatus = 'before';
+  //         break;
+  //       default:
+  //         return;
+  //     }
+
+  //     try {
+  //       const { error } = await supabase.from('todo').update({ status: newStatus }).eq('id', draggableId).select();
+  //       if (error) throw error;
+
+  //       const { data: toDoData } = await supabase.from('todo').select('*');
+  //       setData(toDoData as any);
+  //       message.success(`${getHeaderTitle(newStatus)}(으)로 상태가 변경되었습니다.`, 0.7);
+  //     } catch (error) {
+  //       console.error('Error inserting data:', (error as Error).message);
+  //     }
+
+  //     // 카드의 상태를 업데이트
+  //     const updatedData = data.map((item, index) => (index === draggedIndex ? { ...item, status: newStatus } : item));
+
+  //     // 업데이트된 데이터를 상태로 설정
+  //     setData(updatedData as any);
+  //   }
+  // };
+
   const onDragEnd = async (result: DropResult) => {
     const { source, destination, draggableId } = result;
-    console.log(result);
-    // 드래그가 시작된 위치와 드래그가 끝난 위치가 같지 않으면 처리
-    if (!destination || source.droppableId === destination.droppableId) {
-      return;
-    }
+    if (!destination || source.droppableId === destination.droppableId) return;
 
-    // 드래그된 카드의 index
     const draggedIndex = source.index;
+    const newStatus = getStatus(destination.droppableId);
 
-    // 드래그된 카드 데이터
-    const draggedItem = data.find((_, index) => index === draggedIndex);
+    // Optimistic UI update: Update the status locally first
+    const updatedData = data.map((item, index) => (index === draggedIndex ? { ...item, status: newStatus } : item));
+    setData(updatedData as any);
 
-    if (draggedItem) {
-      // 새로운 상태를 드래그된 위치에 따라 설정
-      let newStatus = '';
-      switch (destination.droppableId) {
-        case 'progress':
-          newStatus = 'progress';
-          break;
-        case 'complete':
-          newStatus = 'complete';
-          break;
-        case 'cancel':
-          newStatus = 'cancel';
-          break;
-        case 'before':
-          newStatus = 'before';
-          break;
-        default:
-          return;
-      }
+    try {
+      // Update the database with the new status
+      const { error } = await supabase.from('todo').update({ status: newStatus }).eq('id', draggableId);
+      if (error) throw error;
 
-      try {
-        const { error } = await supabase.from('todo').update({ status: newStatus }).eq('id', draggableId).select();
-        if (error) throw error;
+      // Re-fetch the data from the database to ensure UI is in sync with the actual state
+      const { data: toDoData, error: fetchError } = await supabase.from('todo').select('*');
+      if (fetchError) throw fetchError;
 
-        const { data: toDoData } = await supabase.from('todo').select('*');
-        setData(toDoData as any);
-        message.success(`${getHeaderTitle(newStatus)}(으)로 상태가 변경되었습니다.`, 0.7);
-      } catch (error) {
-        console.error('Error inserting data:', (error as Error).message);
-      }
+      // Update the state with the fresh data from the database
+      setData(toDoData as Todo[]);
+      // message.success(`Status changed to ${newStatus}.`, 0.7);
+      message.success(`${getHeaderTitle(newStatus)}(으)로 상태가 변경되었습니다.`, 0.7);
+    } catch (error) {
+      console.error('Error updating data:', error);
+      message.error('Failed to update status.');
+    }
+  };
 
-      // 카드의 상태를 업데이트
-      const updatedData = data.map((item, index) => (index === draggedIndex ? { ...item, status: newStatus } : item));
-
-      // 업데이트된 데이터를 상태로 설정
-      setData(updatedData as any);
+  const getStatus = (droppableId: string): string => {
+    switch (droppableId) {
+      case 'progress':
+        return 'progress';
+      case 'complete':
+        return 'complete';
+      case 'cancel':
+        return 'cancel';
+      case 'before':
+        return 'before';
+      default:
+        return '';
     }
   };
 
