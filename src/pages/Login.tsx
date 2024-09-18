@@ -8,6 +8,7 @@ import { supabase } from '@api/supabaseClient';
 import { userInfoStore } from '@store/store';
 import { useCookies } from 'react-cookie';
 import ToDoAllSVG from '@assets/img/ToDoAllSVG';
+import { useNavigate } from 'react-router-dom';
 
 type FieldType = {
   userId?: string;
@@ -16,6 +17,7 @@ type FieldType = {
 };
 
 function Login() {
+  const navigate = useNavigate();
   const { userInfo, setUserInfo } = userInfoStore();
   const [cookies, setCookie, removeCookie] = useCookies(['idSave']);
   const [idSaveCheck, setIdSaveCheck] = useState(false);
@@ -144,6 +146,7 @@ function Login() {
         </Form.Item>
         <Form.Item>
           <Button
+            block
             type="default"
             icon={<GoogleOutlined />}
             onClick={handleSignInWithGoogle}
@@ -159,9 +162,10 @@ function Login() {
           >
             Kakao Login
           </Button> */}
-          <div>
-            <a href="">회원가입</a>
-          </div>
+          <JoinBtn onClick={() => navigate('/join')}>
+            회원가입
+            {/* <a href="">회원가입</a> */}
+          </JoinBtn>
         </Form.Item>
       </Form>
 
@@ -243,4 +247,10 @@ const Logo = styled.div`
     width: 140px;
     height: 56px;
   }
+`;
+const JoinBtn = styled.div`
+  margin-top: 10px;
+  text-align: right;
+  color: #518ef8;
+  cursor: pointer;
 `;

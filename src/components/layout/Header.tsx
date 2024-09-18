@@ -20,7 +20,7 @@ const Header = () => {
       <ToDoAllSVG />
       {userInfo && (
         <Flex gap={8} align="center">
-          {userInfo.email}{' '}
+          {/* {userInfo.email}{' '} */}
           <Button
             type="primary"
             ghost
