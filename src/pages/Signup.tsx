@@ -114,13 +114,13 @@ function Signup() {
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
-        // options: {
-        //   data: {
-        //     email: values.email,
-        //     user_name: values.user_name,
-        //     avatar_url: null,
-        //   },
-        // },
+        options: {
+          data: {
+            email: values.email,
+            user_name: values.user_name,
+            avatar_url: null,
+          },
+        },
       });
 
       if (signUpError) {
