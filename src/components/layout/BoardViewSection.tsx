@@ -72,22 +72,17 @@ const BoardViewSection = ({ data, setData }: BoardViewSectionProps) => {
     const draggedIndex = source.index;
     const newStatus = getStatus(destination.droppableId);
 
-    // Optimistic UI update: Update the status locally first
     const updatedData = data.map((item, index) => (index === draggedIndex ? { ...item, status: newStatus } : item));
     setData(updatedData as any);
 
     try {
-      // Update the database with the new status
       const { error } = await supabase.from('todo').update({ status: newStatus }).eq('id', draggableId);
       if (error) throw error;
 
-      // Re-fetch the data from the database to ensure UI is in sync with the actual state
       const { data: toDoData, error: fetchError } = await supabase.from('todo').select('*');
       if (fetchError) throw fetchError;
 
-      // Update the state with the fresh data from the database
       setData(toDoData as Todo[]);
-      // message.success(`Status changed to ${newStatus}.`, 0.7);
       message.success(`${getHeaderTitle(newStatus)}(으)로 상태가 변경되었습니다.`, 0.7);
     } catch (error) {
       console.error('Error updating data:', error);

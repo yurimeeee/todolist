@@ -88,10 +88,6 @@ function DetailViewModal({ todoId, open, setOpen }: DetailViewModalProps) {
           <Button type="link" danger>
             삭제
           </Button>
-          {/* <Button type="primary" ghost>
-            수정
-          </Button>
-          <Button danger>삭제</Button> */}
         </ButtonWrap>
       </Modal>
     </>

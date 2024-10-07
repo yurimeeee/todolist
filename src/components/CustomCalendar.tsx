@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import styled from 'styled-components';
 import koKR from 'antd/es/locale/ko_KR';
 
@@ -59,12 +58,8 @@ const CustomCalendar = ({ data }: CustomCalendarProps) => {
     >
       <Wrap>
         <Calendar dateCellRender={dateCellRender} mode={'month'} />
-        {/* <Calendar cellRender={cellRender} /> */}
       </Wrap>
     </ConfigProvider>
-    // <div style={{ padding: '20px' }}>
-    //   <Calendar dateCellRender={dateCellRender} />
-    // </div>
   );
 };
 

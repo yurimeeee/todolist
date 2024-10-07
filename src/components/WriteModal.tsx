@@ -103,11 +103,9 @@ const WriteModal = ({ updateMode, todoId, open, setOpen }: WriteModalProps) => {
       };
 
       if (updateMode && todoId) {
-        // Update existing todo
         const { error } = await supabase.from('todo').update(payload).eq('id', todoId);
         if (error) throw error;
       } else {
-        // Create new todo
         const { error } = await supabase.from('todo').insert([payload]);
         if (error) throw error;
       }
@@ -132,7 +130,7 @@ const WriteModal = ({ updateMode, todoId, open, setOpen }: WriteModalProps) => {
         status: '',
         toDoType: '',
       });
-      form.resetFields(); // Reset the form fields
+      form.resetFields();
     }
   };
 

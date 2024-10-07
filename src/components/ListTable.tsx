@@ -113,7 +113,6 @@ const ListTable = ({ isActiveDelete = false }: ListTableProps) => {
       align: 'center',
       fixed: 'right',
       width: 52,
-      // render: (id: string) => <text>{id}</text>,
       render: (key: any) => <CustomDropdown todoId={key?.key} />,
     },
   ];
@@ -131,7 +130,7 @@ const ListTable = ({ isActiveDelete = false }: ListTableProps) => {
   };
 
   const getData = async (uid?: string) => {
-    const { data, error } = await supabase.from('todo').select('*').eq('uid', uid); // Only fetch rows where the uid matches
+    const { data, error } = await supabase.from('todo').select('*').eq('uid', uid);
 
     if (error) {
       console.error('Error fetching data:', error.message);
@@ -163,7 +162,7 @@ const ListTable = ({ isActiveDelete = false }: ListTableProps) => {
       setCheckedList(selectedRowKeys);
     },
     getCheckboxProps: (record: DataType) => ({
-      disabled: record.title === 'Disabled User', // Column configuration not to be checked
+      disabled: record.title === 'Disabled User',
       title: record.title,
     }),
   };
